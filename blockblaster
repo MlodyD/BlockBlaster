@@ -1,0 +1,76 @@
+import tkinter as tk
+
+def on_click_plansza(button, x, y):
+    if tablica[x][y] == 0:
+        button.config(bg="green")
+    else:
+        button.config(bg="white")
+    tablica[x][y] = (tablica[x][y] + 1) % 2
+    button.config(text=f"{x},{y}")
+
+
+tablica = [[0 for _ in range(8)] for _ in range(8)]
+
+root = tk.Tk()
+
+root.geometry("800x800")
+
+
+plansza = tk.Frame(root)
+plansza.place(relx=0.5, y=200, anchor="center")  # Umieszczenie ramki na środku
+
+for x in range(8):
+    for y in range(8):
+        button = tk.Button(plansza, bg="white", width=5, height=2)
+        button.config(command=lambda button=button, x=x, y=y: on_click_plansza(button, x, y))
+        button.grid(column=x,row=y)
+
+klocek1 = tk.Frame(root)
+
+for x in range(5):
+    for y in range(5):
+        button = tk.Button(plansza, bg="white", width=5, height=2)
+        button.config(command=lambda button=button, x=x, y=y: on_click_klocek(button, x, y, 1))
+        button.grid(column=x,row=y)
+
+
+
+root.mainloop()
+import tkinter as tk
+
+def on_click_plansza(button, x, y):
+    if tablica[x][y] == 0:
+        button.config(bg="green")
+    else:
+        button.config(bg="white")
+    tablica[x][y] = (tablica[x][y] + 1) % 2
+    button.config(text=f"{x},{y}")
+
+
+tablica = [[0 for _ in range(8)] for _ in range(8)]
+
+root = tk.Tk()
+
+root.geometry("800x800")
+
+
+plansza = tk.Frame(root)
+plansza.place(relx=0.5, y=200, anchor="center")  # Umieszczenie ramki na środku
+
+for x in range(8):
+    for y in range(8):
+        button = tk.Button(plansza, bg="white", width=5, height=2)
+        button.config(command=lambda button=button, x=x, y=y: on_click_plansza(button, x, y))
+        button.grid(column=x,row=y)
+
+klocek1 = tk.Frame(root)
+
+for x in range(5):
+    for y in range(5):
+        button = tk.Button(plansza, bg="white", width=5, height=2)
+        button.config(command=lambda button=button, x=x, y=y: on_click_klocek(button, x, y, 1))
+        button.grid(column=x,row=y)
+
+
+
+root.mainloop()
