@@ -1,19 +1,148 @@
 import tkinter as tk
+import copy as cp
+
+def czyMoznaWlozycKlocekNaWspolrzednych(plansza, klocek, x, y):
+    for xi in range(5):
+        for yi in range(5):
+            if yi + y > 7 or xi + x > 7:   #jesli klocek wystaje poza 7 pole to sie nie miesci w planszy
+                if klocek[xi][yi] == 1:
+                    return False
+            elif plansza[x + xi][y + yi] == 1 and klocek[xi][yi] == 1:    #jesli na polu w planszy jest klocek no to nie mozna wstawic
+                return False
+    return True
+
+def zdejmijZapelnioneLinie(plansza):
+    counterPoziomy = [0] * 8
+    counterPionowy = [0] * 8
+                                #sprawdzenie zapełnionych poziomow i pionow
+    for xi in range(8):
+        for yi in range(8):
+            counterPoziomy[xi] += plansza[xi][yi]
+            counterPionowy[yi] += plansza[xi][yi]
+    
+    for xi in range(8):
+        for yi in range(8):
+            if counterPoziomy[xi] == 8 or counterPionowy[yi] == 8:
+                plansza[xi][yi] = 0
+
+
+def wlozKlocekNaXY(klocek, plansza, x, y):
+    print("klocek")
+    print(klocek)
+    print("x:")
+    print(x)
+    print("y:")
+    print(y)
+    for xi in range(5):
+        for yi in range(5):
+            if x + xi <= 7 and y + yi <= 7:
+                plansza[x+xi][y+yi] += klocek[xi][yi]   #dodawanie klocka do planszy\
+    zdejmijZapelnioneLinie(plansza)
+    
+    
+def czyMoznaUlozycKlocki(plansza, k1, k2, k3, wspolrzedne):
+    for x in range(8):
+        for y in range(8):
+            if k3 != []:
+                if czyMoznaWlozycKlocekNaWspolrzednych(plansza, k3, x, y):
+                    kopiaPlanszy = cp.deepcopy(plansza)
+                    wlozKlocekNaXY(k3, kopiaPlanszy, x, y)
+                    if czyMoznaUlozycKlocki(kopiaPlanszy,k1,k2,[], wspolrzedne):
+                        #wspolrzedne[4] = x
+                        #wspolrzedne[5] = y
+                        print("plansza1:")
+                        print(plansza)
+                        print("klocek")
+                        print(k3)
+                        print("x")
+                        print(x)
+                        print("y")
+                        print(y)
+                        return True
+            elif k2 != []:
+                if czyMoznaWlozycKlocekNaWspolrzednych(plansza, k2, x, y):
+                    kopiaPlanszy = cp.deepcopy(plansza)
+                    wlozKlocekNaXY(k2, kopiaPlanszy, x, y)
+                    if czyMoznaUlozycKlocki(kopiaPlanszy,k1,[],[], wspolrzedne):
+                        #wspolrzedne[2] = x
+                        #wspolrzedne[3] = y
+                        print("plansza2:")
+                        print(plansza)
+                        print("klocek")
+                        print(k2)
+                        print("x")
+                        print(x)
+                        print("y")
+                        print(y)
+                        return True
+            elif k1 != []:
+                if czyMoznaWlozycKlocekNaWspolrzednych(plansza, k1, x, y):
+                    #wspolrzedne[0] = x
+                    #wspolrzedne[1] = y
+                    print("plansza3:")
+                    print(plansza)
+                    print("klocek")
+                    print(k1)
+                    print("x")
+                    print(x)
+                    print("y")
+                    print(y)
+                    return True
+    return False
+
+def czyIstniejeUlozenieKlockow(tablica, klocek1, klocek2, klocek3, wspolrzedne, kolejnosc):
+    if czyMoznaUlozycKlocki(tablica, klocek1, klocek2, klocek3, wspolrzedne):
+        kolejnosc = [1,2,3]
+        return True
+    if czyMoznaUlozycKlocki(tablica, klocek1, klocek3, klocek2, wspolrzedne):
+        kolejnosc = [1,3,2]
+        return True
+    if czyMoznaUlozycKlocki(tablica, klocek2, klocek1, klocek3, wspolrzedne):
+        kolejnosc = [2,1,3]
+        return True
+    if czyMoznaUlozycKlocki(tablica, klocek2, klocek3, klocek1, wspolrzedne):
+        kolejnosc = [2,3,1]
+        return True
+    if czyMoznaUlozycKlocki(tablica, klocek3, klocek1, klocek2, wspolrzedne):
+        kolejnosc = [3,1,2]
+        return True
+    if czyMoznaUlozycKlocki(tablica, klocek3, klocek2, klocek1, wspolrzedne):
+        kolejnosc = [3,2,1]
+        return True
+    return False
+
+
+def odpowiedz(guzik):
+    if czyIstniejeUlozenieKlockow(tablica,klocek[0],klocek[1],klocek[2], wspolrzedne, kolejnosc):
+        guzik.config(text="Mozna ulozyc klocki", bg="Green")
+    else:
+        guzik.config(text="Nie mozna ulozyc klockow", bg="Red")
+
 
 def on_click_plansza(button, x, y):
     if tablica[x][y] == 0:
         button.config(bg="green")
     else:
-        button.config(bg="white")
+        button.config(bg="grey45")
     tablica[x][y] = (tablica[x][y] + 1) % 2
+    button.config(text=f"{x},{y}")
+
+def on_click_klocek(button, x, y, ktory):
+    if klocek[ktory-1][x][y] == 0:
+        button.config(bg="green")
+    else:
+        button.config(bg="grey45")
+    klocek[ktory-1][x][y] = (klocek[ktory-1][x][y] + 1) % 2
     button.config(text=f"{x},{y}")
 
 
 tablica = [[0 for _ in range(8)] for _ in range(8)]
+klocek = [[[0 for x in range(5)] for y in range(5)] for z in range(3)]
 
 root = tk.Tk()
 
 root.geometry("800x800")
+root.config(bg="grey10")
 
 
 plansza = tk.Frame(root)
@@ -21,56 +150,41 @@ plansza.place(relx=0.5, y=200, anchor="center")  # Umieszczenie ramki na środku
 
 for x in range(8):
     for y in range(8):
-        button = tk.Button(plansza, bg="white", width=5, height=2)
-        button.config(command=lambda button=button, x=x, y=y: on_click_plansza(button, x, y))
+        button = tk.Button(plansza, bg="grey45", width=5, height=2)
+        button.config(command=lambda button=button, x=x, y=7-y: on_click_plansza(button, x, y))
         button.grid(column=x,row=y)
 
 klocek1 = tk.Frame(root)
+klocek1.place(relx=0.25, y=500, anchor="center")
+klocek2 = tk.Frame(root)
+klocek2.place(relx=0.5, y=500, anchor="center")
+klocek3 = tk.Frame(root)
+klocek3.place(relx=0.75, y=500, anchor="center")
 
 for x in range(5):
     for y in range(5):
-        button = tk.Button(plansza, bg="white", width=5, height=2)
-        button.config(command=lambda button=button, x=x, y=y: on_click_klocek(button, x, y, 1))
+        button = tk.Button(klocek1, bg="grey45", width=3, height=1)
+        button.config(command=lambda button=button, x=x, y=4-y: on_click_klocek(button, x, y, 1))
         button.grid(column=x,row=y)
-
-
-
-root.mainloop()
-import tkinter as tk
-
-def on_click_plansza(button, x, y):
-    if tablica[x][y] == 0:
-        button.config(bg="green")
-    else:
-        button.config(bg="white")
-    tablica[x][y] = (tablica[x][y] + 1) % 2
-    button.config(text=f"{x},{y}")
-
-
-tablica = [[0 for _ in range(8)] for _ in range(8)]
-
-root = tk.Tk()
-
-root.geometry("800x800")
-
-
-plansza = tk.Frame(root)
-plansza.place(relx=0.5, y=200, anchor="center")  # Umieszczenie ramki na środku
-
-for x in range(8):
-    for y in range(8):
-        button = tk.Button(plansza, bg="white", width=5, height=2)
-        button.config(command=lambda button=button, x=x, y=y: on_click_plansza(button, x, y))
-        button.grid(column=x,row=y)
-
-klocek1 = tk.Frame(root)
 
 for x in range(5):
     for y in range(5):
-        button = tk.Button(plansza, bg="white", width=5, height=2)
-        button.config(command=lambda button=button, x=x, y=y: on_click_klocek(button, x, y, 1))
+        button = tk.Button(klocek2, bg="grey45", width=3, height=1)
+        button.config(command=lambda button=button, x=x, y=4-y: on_click_klocek(button, x, y, 2))
         button.grid(column=x,row=y)
 
+for x in range(5):
+    for y in range(5):
+        button = tk.Button(klocek3, bg="grey45", width=3, height=1)
+        button.config(command=lambda button=button, x=x, y=4-y: on_click_klocek(button, x, y, 3))
+        button.grid(column=x,row=y)
 
+wspolrzedne = [0,0, 0,0, 0,0]
+kolejnosc = [0, 0, 0]
+
+
+guzikSprawdz = tk.Button(root, bg="grey45", width=20, height=1, text="czy mozna ulozyc")
+guzikSprawdz.config(command= lambda : odpowiedz(guzikSprawdz))
+guzikSprawdz.place(relx=0.5, y=600, anchor="center")
 
 root.mainloop()
